@@ -2,8 +2,6 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
   alias(libs.plugins.kotlin.compose)
-  // À retirer si Room n'est plus utilisé :
-  alias(libs.plugins.google.devtools.ksp)
 }
 
 android {
@@ -17,12 +15,16 @@ android {
     versionCode = 1
     versionName = "1.0"
 
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner =
+      "androidx.test.runner.AndroidJUnitRunner"
   }
 
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
+      val keystorePath =
+        System.getenv("KEYSTORE_PATH")
+          ?: "${rootDir}/my-upload-key.jks"
+
       storeFile = file(keystorePath)
       storePassword = System.getenv("STORE_PASSWORD")
       keyAlias = "upload"
@@ -34,7 +36,14 @@ android {
     release {
       isCrunchPngs = false
       isMinifyEnabled = false
-      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
+      proguardFiles(
+        getDefaultProguardFile(
+          "proguard-android-optimize.txt"
+        ),
+        "proguard-rules.pro"
+      )
+
       signingConfig = signingConfigs.getByName("release")
     }
   }
@@ -43,6 +52,7 @@ android {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
   }
+
   kotlinOptions {
     jvmTarget = "17"
   }
@@ -65,9 +75,26 @@ android {
 }
 
 dependencies {
-  // Compose BOM & UI
-  implementation(platform(libs.androidx.compose.bom))
+
+  // Module KMP partagé
+  implementation(project(":shared"))
+
+  // Kotlinx
+  implementation(libs.kotlinx.datetime)
+  implementation(libs.kotlinx.coroutines.android)
+  implementation(libs.kotlinx.coroutines.core)
+
+  // Android / Activity
   implementation(libs.androidx.activity.compose)
+  implementation("androidx.activity:activity-ktx:1.9.3")
+
+  // Lifecycle
+  implementation(libs.androidx.lifecycle.runtime.ktx)
+  implementation(libs.androidx.lifecycle.runtime.compose)
+  implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+  // Compose
+  implementation(platform(libs.androidx.compose.bom))
   implementation(libs.androidx.compose.material3)
   implementation(libs.androidx.compose.material.icons.core)
   implementation(libs.androidx.compose.material.icons.extended)
@@ -75,20 +102,8 @@ dependencies {
   implementation(libs.androidx.compose.ui.graphics)
   implementation(libs.androidx.compose.ui.tooling.preview)
 
-  // Android Core & Lifecycle
+  // Android Core
   implementation(libs.androidx.core.ktx)
-  implementation(libs.androidx.lifecycle.runtime.compose)
-  implementation(libs.androidx.lifecycle.runtime.ktx)
-  implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-  // Coroutines
-  implementation(libs.kotlinx.coroutines.android)
-  implementation(libs.kotlinx.coroutines.core)
-
-  // Base locale (à retirer si vous n'utilisez pas Room)
-  implementation(libs.androidx.room.ktx)
-  implementation(libs.androidx.room.runtime)
-  "ksp"(libs.androidx.room.compiler)
 
   // Tests unitaires
   testImplementation(libs.junit)
@@ -98,12 +113,14 @@ dependencies {
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.robolectric)
 
-  // Tests instrumentés & Debug
+  // Tests instrumentés
   androidTestImplementation(platform(libs.androidx.compose.bom))
   androidTestImplementation(libs.androidx.compose.ui.test.junit4)
   androidTestImplementation(libs.androidx.espresso.core)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.runner)
+
+  // Debug
   debugImplementation(libs.androidx.compose.ui.tooling)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

@@ -1,3 +1,4 @@
+
 package com.example.ui.components
 
 import androidx.compose.foundation.background
@@ -28,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,10 +47,11 @@ import java.util.Locale
 
 /**
  * Composant atomique réutilisable pour afficher chaque dépense.
- * Cliquer sur la carte déclenche [onClick] pour ouvrir le formulaire pré-rempli d'édition.
+ * Cliquer sur la carte déclenche [onClick] pour ouvrir le formulaire
+ * pré-rempli d'édition.
  *
  * @param transaction La transaction immuable à afficher.
- * @param onClick Callback déclenché au clic sur la carte (modification).
+ * @param onClick Callback déclenché au clic sur la carte.
  * @param onDelete Callback déclenché pour supprimer la transaction.
  * @param modifier Modificateur Compose optionnel.
  */
@@ -61,16 +62,28 @@ fun TransactionCard(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val categoryName = stringResource(transaction.category.labelResId)
+    val categoryName = transaction.category.displayName
+
     val todayText = stringResource(R.string.date_today)
     val yesterdayText = stringResource(R.string.date_yesterday)
     val currencyFcfa = stringResource(R.string.currency_fcfa)
 
-    val formattedDate = remember(transaction.date, todayText, yesterdayText) {
-        formatRelativeDate(transaction.date, todayText, yesterdayText)
+    val formattedDate = remember(
+        transaction.dateMillis,
+        todayText,
+        yesterdayText
+    ) {
+        formatRelativeDate(
+            transaction.dateMillis,
+            todayText,
+            yesterdayText
+        )
     }
 
-    val formattedAmount = remember(transaction.amount, currencyFcfa) {
+    val formattedAmount = remember(
+        transaction.amount,
+        currencyFcfa
+    ) {
         val nf = NumberFormat.getNumberInstance(Locale.FRENCH)
         nf.maximumFractionDigits = 0
         "${nf.format(transaction.amount)} $currencyFcfa"
@@ -80,7 +93,11 @@ fun TransactionCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .border(width = 1.dp, color = DarkOutline, shape = RoundedCornerShape(20.dp))
+            .border(
+                width = 1.dp,
+                color = DarkOutline,
+                shape = RoundedCornerShape(20.dp)
+            )
             .clickable(onClick = onClick)
             .testTag("transaction_card_${transaction.id}"),
         color = DarkSurfaceVariant,
@@ -90,10 +107,13 @@ fun TransactionCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(
+                    horizontal = 16.dp,
+                    vertical = 14.dp
+                ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Badge d'icône/emoji avec fond violet sombre contrasté
+            // Badge d'icône/emoji avec fond violet sombre
             Box(
                 modifier = Modifier
                     .size(46.dp)
@@ -109,11 +129,13 @@ fun TransactionCard(
 
             Spacer(modifier = Modifier.width(14.dp))
 
-            // Intitulé en Blanc pur et métadonnées en Gris clair hautement lisible
+            // Intitulé et métadonnées
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
                         text = transaction.title,
                         style = MaterialTheme.typography.titleMedium.copy(
@@ -122,17 +144,27 @@ fun TransactionCard(
                         ),
                         color = Color.White,
                         maxLines = 1,
-                        modifier = Modifier.weight(1f, fill = false)
+                        modifier = Modifier.weight(
+                            1f,
+                            fill = false
+                        )
                     )
+
                     Spacer(modifier = Modifier.width(4.dp))
+
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.content_desc_edit),
+                        contentDescription = stringResource(
+                            R.string.content_desc_edit
+                        ),
                         tint = DarkTextSecondary.copy(alpha = 0.5f),
                         modifier = Modifier.size(13.dp)
                     )
                 }
+
                 Spacer(modifier = Modifier.height(3.dp))
+
+                // Nom de la catégorie et date
                 Text(
                     text = "$categoryName • $formattedDate",
                     style = MaterialTheme.typography.bodyMedium.copy(
@@ -145,7 +177,7 @@ fun TransactionCard(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Montant en Blanc Pur et bouton de suppression
+            // Montant et bouton de suppression
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(2.dp)
@@ -163,11 +195,16 @@ fun TransactionCard(
                     onClick = onDelete,
                     modifier = Modifier
                         .size(40.dp)
-                        .testTag("delete_transaction_${transaction.id}")
+                        .testTag(
+                            "delete_transaction_${transaction.id}"
+                        )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.content_desc_delete_format, transaction.title),
+                        contentDescription = stringResource(
+                            R.string.content_desc_delete_format,
+                            transaction.title
+                        ),
                         tint = DarkTextSecondary,
                         modifier = Modifier.size(20.dp)
                     )
@@ -178,7 +215,8 @@ fun TransactionCard(
 }
 
 /**
- * Formate un timestamp en libellé lisible relatif (Aujourd'hui, Hier, ou date calendaire).
+ * Formate un timestamp en libellé lisible relatif
+ * (Aujourd'hui, Hier, ou date calendaire).
  */
 fun formatRelativeDate(
     timestamp: Long,

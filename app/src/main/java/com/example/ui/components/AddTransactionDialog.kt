@@ -6,10 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -61,6 +60,7 @@ import com.example.ui.theme.VioletPrimaryLight
  * @param onDismissRequest Déclenché lors de l'annulation ou fermeture.
  * @param onConfirm Déclenché avec les données saisies (titre, montant, catégorie).
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddTransactionDialog(
     initialTransaction: Transaction? = null,
@@ -81,7 +81,7 @@ fun AddTransactionDialog(
         )
     }
     var selectedCategory by remember(initialTransaction) {
-        mutableStateOf(initialTransaction?.category ?: Category.ALIMENTATION)
+        mutableStateOf(initialTransaction?.category ?: Category.FOOD)
     }
     var isError by remember { mutableStateOf(false) }
 
@@ -218,17 +218,17 @@ fun AddTransactionDialog(
                         color = Color.White
                     )
 
-                    Row(
+                    FlowRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Category.entries.forEach { category ->
                             val isSelected = category == selectedCategory
-                            val label = stringResource(category.labelResId)
+                            val label = category.displayName
 
                             Box(
                                 modifier = Modifier
-                                    .weight(1f)
                                     .clip(RoundedCornerShape(14.dp))
                                     .background(
                                         if (isSelected) VioletPrimary else DarkDialogChipInactive
@@ -242,25 +242,18 @@ fun AddTransactionDialog(
                                         keyboardController?.hide()
                                         selectedCategory = category
                                     }
-                                    .padding(vertical = 8.dp, horizontal = 4.dp),
+                                    .padding(vertical = 8.dp, horizontal = 12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Text(text = category.emoji, fontSize = 18.sp)
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = label,
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            fontSize = 10.sp,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                                        ),
-                                        color = if (isSelected) Color.White else Color(0xFFE2E2EC),
-                                        maxLines = 1
-                                    )
-                                }
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontSize = 11.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                    ),
+                                    color = if (isSelected) Color.White else Color(0xFFE2E2EC),
+                                    maxLines = 1
+                                )
                             }
                         }
                     }

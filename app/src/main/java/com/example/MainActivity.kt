@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import com.example.ui.screens.EcoBudgetScreen
 import com.example.ui.theme.MyApplicationTheme
 import com.example.viewmodel.EcoBudgetViewModel
+import com.example.viewmodel.EcoBudgetUiState
 
 class MainActivity : ComponentActivity() {
   private val viewModel: EcoBudgetViewModel by viewModels()
